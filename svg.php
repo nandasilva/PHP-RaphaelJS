@@ -13,7 +13,7 @@ include_once 'libs/PHPRaphael.php';
  * @param string 	The path where your svg file is
  * @var PHPRaphael
  */
-$svg = new PHPRaphael('svgmapEstado', 300, 300, 'svg/animals.svg');
+$svg = new PHPRaphael('svgmapEstado', 300, 300, 'svg/abstract.svg');
 
 /**
  * Show the code...

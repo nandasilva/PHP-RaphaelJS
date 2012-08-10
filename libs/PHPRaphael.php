@@ -83,6 +83,10 @@ class PHPRaphael {
 		$i = 1;
 
 		foreach($this->svg as $s) {
+			// Break the loop if find gradient
+			if(isset($s['gradientUnits']))
+				break;
+
 			// Get the name of tag
 			$type = $s->getName();
 
@@ -104,6 +108,11 @@ class PHPRaphael {
 	private function createAttrSvg() {
 		$i = 1;
 		foreach($this->svg as $s) {
+			// Break the loop if find gradient
+			if(isset($s['gradientUnits']))
+				break;
+
+
 			$attr = '';
 
 			// foreach in attributes
