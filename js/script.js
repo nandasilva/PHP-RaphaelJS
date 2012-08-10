@@ -1,3 +1,3 @@
-
-
-
+$.fn.ready(function() {
+	
+});
