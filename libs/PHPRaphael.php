@@ -40,6 +40,7 @@ class PHPRaphael {
 	private $element;
 	private $js;
 	private $attr;
+	private $arr;
 
 	/**
 	 * Create the javascript element
@@ -62,6 +63,8 @@ class PHPRaphael {
 		$this->createElementsSvg();
 		$this->createAttrSvg();
 		$this->createIdSvg();
+		$this->createArrayElements();
+		$this->createHoverEffects();
 
 		return $this;
 	}
@@ -126,6 +129,11 @@ class PHPRaphael {
 				$attr .= "\"{$k}\": \"{$a}\",";
 			}
 
+			/**
+			 * Defaults attr
+			 */
+			$attr .= "\"stroke-width\": 0,";
+
 			// Get the name of tag
 			$type = $s->getName();
 
@@ -138,15 +146,66 @@ class PHPRaphael {
 			// Append in js result the attrs
 			$this->js .= "{$varName}.attr({ {$attr} });";
 
+
 			// Increment $i
 			$i++;
 		}
 	}
 
-	private function createArraySvgElements() {
-		foreach($this->svg as $s) {
+	/**
+	 * Create a array with all elements and variables
+	 * You can use this array for create effects, etc
+	 * @return void 
+	 */
+	private function createArrayElements() {
+		$i = 1;
 
+		foreach($this->svg as $a) {
+			// Break the loop if find gradient
+			if(isset($a['gradientUnits']))
+				break;
+
+			// Get the name of tag
+			$type = $a->getName();
+
+			// Create de javascript variable name
+			$varName = isset($s['id']) ? $s['id'] : $type . $i;
+
+			// Create names
+			$arr .= "{$varName},";
+
+			$i++;
 		}
+
+		// Remove last comma
+		$arr = substr($arr, 0, -1);
+
+		$this->js .= "var objs_{$this->element} = [{$arr}];";
+
+	}
+
+	/**
+	 * Create the hover effects in svg elements
+	 * @param  string  $from The initial color
+	 * @param  string  $to   The final color
+	 * @param  integer $time Time of animation in miliseconds
+	 * @return void        
+	 */
+	public function createHoverEffects($from = '#FFF', $to = '#CCC', $time = 200) {
+		$this->js .= "for(var svgObj in objs_{$this->element}) {";
+
+			$this->js .= "var obj = objs_{$this->element}[svgObj];";
+			$this->js .= "obj.hover(function(){
+								this.animate({
+									fill: '{$from}'
+								}, {$time});
+							}, function(){
+								this.animate({
+									fill: '{$to}'
+								}, {$time});
+							});";
+
+		$this->js .= "}";
 	}
 
 	/**
@@ -156,6 +215,11 @@ class PHPRaphael {
 	 */
 	private function createIdSvg() {
 		foreach($this->svg as $s) {
+			// If exist gradient, break the loop
+			if(isset($s['gradientUnits']))
+				break;
+
+			// If exist id create the id
 			if(isset($s['id']))
 				// svgObj.node.id = 'val';
 				$this->js .= "{$s['id']}.node.id = '{$s['id']}';";
